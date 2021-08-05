@@ -25,6 +25,17 @@ chrome.alarms.onAlarm.addListener(alarm => {
 chrome.storage.onChanged.addListener((changes) => {
   console.log('changes: ',changes)
   
+  if (changes.time) {
+
+
+    console.log(changes.time.newValue)
+
+  }
+  if (changes.on.newValue === false) {
+    chrome.storage.sync.get("intervalId", ({intervalId}) => {
+      clearInterval(intervalId);
+    })
+  }
   if (changes.on.newValue === true || changes.change) {
 
     console.log('got here')
@@ -37,17 +48,21 @@ chrome.storage.onChanged.addListener((changes) => {
       
       chrome.storage.sync.get("url", ({ url }) => {
       
-      console.log('retrieved from storage: ', url)
-      setInterval(async () => {
-        console.log('reloading...',url,' : window: ',window)
-        await chrome.storage.sync.get("change",({change}) => {
-          chrome.storage.sync.set({ change: !change })
-          
-        })
-        chrome.tabs.reload(window)
-        /*
-        */
-      }, 3000)
+
+        chrome.storage.sync.get("time", ({ time }) => {
+            console.log('retrieved from storage: ', url)
+            let intervalId = setInterval(async () => {
+              // console.log('reloading...',url,' : window: ',window)
+              await chrome.storage.sync.get("change",({change}) => {
+                chrome.storage.sync.set({ change: !change })
+                
+              })
+              chrome.tabs.reload(window)
+              /*
+              */
+            }, time)
+            chrome.storage.sync.set({ intervalId })
+          })
     })
       
       
@@ -65,7 +80,7 @@ chrome.storage.onChanged.addListener((changes) => {
   }
 })
 
-
+/*
 function test3() {
     // console.log('newValue: ',changes.newValue)
     chrome.storage.sync.get("url", ({ url }) => {
@@ -79,11 +94,11 @@ function test3() {
         })
         window.location.replace(url)
         /*
-        */
       }, 3000)
     })
-}
-
+  }
+  
+  */
 
 /*
 

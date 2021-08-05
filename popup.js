@@ -2,40 +2,56 @@
 
 console.log('popup open')
 
-let changeColor = document.getElementById("changeColor");
+let refresh = document.getElementById("refresh");
 
 let colorD = document.getElementById('color');
 let timeD = document.getElementById('time');
 let urlD = document.getElementById('url')
-
+/*
 chrome.storage.sync.get("color", ({ color }) => {
   changeColor.style.backgroundColor = color;
   colorD.innerText = color;
 });
+*/
 //console.log('got color in pop-up: ',test);
 
-chrome.storage.sync.get("time", ({ time }) => {
-  console.log('got time in pop-up: ',time);
-  //changeColor.style.backgroundColor = color;
-  timeD.innerText = `${time}`;
-});
+// chrome.storage.sync.get("time", ({ time }) => {
+//   console.log('got time in pop-up: ',time);
+//   timeD.innerText = `${time}`;
+// });
 
-chrome.storage.sync.get("url", ({ url }) => {
-  console.log('got url in pop-up: ',url);
-  //changeColor.style.backgroundColor = color;
-  urlD.innerText = url;
-});
+// chrome.storage.sync.get("url", ({ url }) => {
+//   console.log('got url in pop-up: ',url);
+//   urlD.innerText = url;
+// });
+
+
+
+
+
 
 // When the button is clicked, inject setPageBackgroundColor into current page
-changeColor.addEventListener("click", async () => {
+refresh.addEventListener("click", async () => {
+
+
   let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    let window = tab.id;
-    chrome.storage.sync.set({ window })
-  // console.log(tab[0])
-  chrome.scripting.executeScript({
-    target: { tabId: tab.id },
-    function: setPageBackgroundColor,
-  });
+  chrome.storage.sync.get("on", ({on}) => {
+    if (on === false) {
+        let window = tab.id;
+        chrome.storage.sync.set({ window })
+        chrome.storage.sync.set({ on: true })
+      // console.log(tab[0])
+      /*
+      chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        function: setPageBackgroundColor,
+      });
+      */
+    } else {
+      chrome.storage.sync.set({ on: false })
+    }
+  })
+
 });
 /*
 chrome.storage.sync.get("on", ({ on }) => {
@@ -55,11 +71,11 @@ chrome.storage.sync.get("on", ({ on }) => {
 // console.log('hi')
 // The body of this function will be execuetd as a content script inside the
 // current page
-function setPageBackgroundColor() {
-  chrome.storage.sync.get("on", ({ on }) => {
-  console.log('on: ',on)
-  /chrome.storage.sync.set({ on: !on })
-  })
+// function setPageBackgroundColor() {
+//   chrome.storage.sync.get("on", ({ on }) => {
+//   console.log('on: ',on)
+  
+//   })
   /*
   let test = document.location;
   console.log(test.href)
@@ -81,7 +97,7 @@ function setPageBackgroundColor() {
       }, 3000)
     //})
     */
-}
+// }
   // let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   
  
